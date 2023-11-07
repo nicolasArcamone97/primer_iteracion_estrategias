@@ -1,0 +1,124 @@
+var models = require("../models");
+
+
+const obtenerCarreras = (req, res) => {
+  const pagina = parseInt(req.query.pagina) || 1; // Número de página (por defecto 1)
+  const elementosPorPagina = parseInt(req.query.elementosPorPagina) || 5; // Elementos por página (por defecto 10)
+
+  const offset = (pagina - 1) * elementosPorPagina;
+
+  models.carrera
+    .findAndCountAll({
+      attributes: ["id", "nombre", "descripcion", "duracion"],
+      include: [
+        {
+          as: "Materias",
+          model: models.materia,
+          attributes: ["id", "nombre"]
+        }
+      ],
+      limit: elementosPorPagina,
+      offset: offset
+    })
+    .then(resultado => {
+      const carreras = resultado.rows;
+      const totalCarreras = resultado.count;
+
+      const totalPaginas = Math.ceil(totalCarreras / elementosPorPagina);
+
+      res.json({
+        carreras,
+        totalCarreras,
+        totalPaginas,
+        paginaActual: pagina
+      });
+    })
+    .catch(() => res.sendStatus(500));
+}
+
+
+
+
+
+
+
+
+const crearCarrera = (req,res) => {
+    models.carrera
+    .create({ nombre: req.body.nombre, descripcion: req.body.descripcion, duracion: req.body.duracion })
+    .then(carrera => res.status(201).send({ id: carrera.id }))
+    .catch(error => {
+      if (error == "SequelizeUniqueConstraintError: Validation error") {
+        res.status(400).send('Bad request: existe otra carrera con el mismo nombre')
+      }
+      else {
+        console.log(`Error al intentar insertar en la base de datos: ${error}`)
+        res.sendStatus(500)
+      }
+    });
+}
+
+
+const findCarrera = (id, { onSuccess, onNotFound, onError }) => {
+    models.carrera
+      .findOne({
+        attributes: ["id", "nombre"],
+        where: { id }
+      })
+      .then(carrera => (carrera ? onSuccess(carrera) : onNotFound()))
+      .catch(() => onError());
+  };
+
+
+const obtenerCarrera = (req,res) => {
+    findCarrera(req.params.id, {
+        onSuccess: carrera => res.send(carrera),
+        onNotFound: () => res.sendStatus(404),
+        onError: () => res.sendStatus(500)
+      });
+}
+
+
+const actualizarCarrera = (req,res) => {
+    const onSuccess = carrera =>
+    carrera
+      .update({ nombre: req.body.nombre }, { fields: ["nombre"] })
+      .then(() => res.sendStatus(200))
+      .catch(error => {
+        if (error == "SequelizeUniqueConstraintError: Validation error") {
+          res.status(400).send('Bad request: existe otra carrera con el mismo nombre')
+        }
+        else {
+          console.log(`Error al intentar actualizar la base de datos: ${error}`)
+          res.sendStatus(500)
+        }
+      });
+    findCarrera(req.params.id, {
+    onSuccess,
+    onNotFound: () => res.sendStatus(404),
+    onError: () => res.sendStatus(500)
+  });
+}
+
+
+const eliminarCarrera = (req,res) => {
+    const onSuccess = carrera =>
+    carrera
+      .destroy()
+      .then(() => res.sendStatus(200))
+      .catch(() => res.sendStatus(500));
+    findCarrera(req.params.id, {
+    onSuccess,
+    onNotFound: () => res.sendStatus(404),
+    onError: () => res.sendStatus(500)
+  });
+}
+
+
+module.exports = {
+    obtenerCarreras,
+    crearCarrera,
+    obtenerCarrera,
+    actualizarCarrera,
+    eliminarCarrera
+}
