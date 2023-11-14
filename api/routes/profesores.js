@@ -2,8 +2,13 @@ var express = require("express");
 var router = express.Router();
 const { obtenerProfesores, crearProfesor, obtenerProfesor, actualizarProfesor, eliminarProfesor } = require('../controllers/profesorControllers')
 
+// middle para proteger rutas
 
-router.get("/", obtenerProfesores)
+const auth = require('../middleware/auth')
+
+
+
+router.get("/", auth,obtenerProfesores)
 
 router.post("/", crearProfesor)
 
