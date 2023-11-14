@@ -2,7 +2,7 @@ var models = require("../models");
 
 const obtenerMaterias = (req,res) => {
   models.materia.findAll({
-    attributes: ["id", "nombre", "id_carrera"],
+    attributes: ["id", "nombre", "id_carrera", "id_profesor"],
     include: [
       {
         as: "Carrera-Relacionada",
@@ -94,10 +94,32 @@ const eliminarMateria = (req, res) => {
 }
 
 
+
+// buscar materia 
+
+// const buscarMateria = async (req, res, next) => {
+//     try{
+//       // obtener materia
+//       const {query} = req.params
+//       const materia = await models.materia.find({nombre: new RegExp(query, 'i')})        //la i es para que no sea tan preciso la bsuqueda  
+//       res.json(materia)
+
+//     } catch (error) {
+//       console.log(error);
+//       next();
+//     }
+
+// }
+
+
+
+
+
 module.exports = {
     obtenerMaterias,
     crearMateria,
     obtenerMateria,
     actualizarMateria,
-    eliminarMateria
+    eliminarMateria,
+   
 }

@@ -1,68 +1,82 @@
 var models = require("../models");
 
 
-const obtenerCarreras = (req, res) => {
-  const pagina = parseInt(req.query.pagina) || 1; // Número de página (por defecto 1)
-  const elementosPorPagina = parseInt(req.query.elementosPorPagina) || 5; // Elementos por página (por defecto 10)
 
-  const offset = (pagina - 1) * elementosPorPagina;
-
+const obtenerCarreras = (req,res) => {
   models.carrera
-    .findAndCountAll({
-      attributes: ["id", "nombre", "descripcion", "duracion"],
-      include: [
-        {
-          as: "Materias",
-          model: models.materia,
-          attributes: ["id", "nombre"]
-        }
-      ],
-      limit: elementosPorPagina,
-      offset: offset
-    })
-    .then(resultado => {
-      const carreras = resultado.rows;
-      const totalCarreras = resultado.count;
-
-      const totalPaginas = Math.ceil(totalCarreras / elementosPorPagina);
-
-      res.json({
-        carreras,
-        totalCarreras,
-        totalPaginas,
-        paginaActual: pagina
-      });
-    })
+    .findAll({
+      attributes:["id", "nombre", "descripcion", "duracion"],
+      include: [{as: "Materias", model: models.materia, attributes: ["id","nombre"]}]
+    }).then(carreras => res.send(carreras))
     .catch(() => res.sendStatus(500));
 }
 
+// const obtenerCarreras = (req, res) => {
+//   const pagina = parseInt(req.query.pagina) || 1;
+//   const elementosPorPagina = parseInt(req.query.elementosPorPagina) || 5;
+//   const offset = (pagina - 1) * elementosPorPagina;
+
+//   models.carrera
+//     .findAndCountAll({
+//       attributes: ["id", "nombre", "descripcion", "duracion"],
+//       include: [
+//         {
+//           model: models.materia,
+//           attributes: ["id", "nombre"],
+//           as: "Materias"
+//         }
+//       ],
+//       limit: elementosPorPagina,
+//       offset: offset
+//     })
+//     .then(resultado => {
+//       const carreras = resultado.rows;
+//       const totalCarreras = resultado.count;
+
+//       const totalPaginas = Math.ceil(totalCarreras / elementosPorPagina);
+
+//       res.json({
+//         carreras,
+//         totalCarreras,
+//         totalPaginas,
+//         paginaActual: pagina
+//       });
+//     })
+//     .catch(() => res.sendStatus(500));
+// };
 
 
 
+const crearCarrera = async (req, res) => {
+  try {
+    const nuevaCarrera = {
+      nombre: req.body.nombre,
+      descripcion: req.body.descripcion,
+      duracion: req.body.duracion
+    };
+
+    const carrera = await models.carrera.create(nuevaCarrera);
+
+    res.status(201).json({ id: carrera.id, mensaje: 'Carrera agregada exitosamente' });
+
+  } catch (error) {
+    if (error.name === "SequelizeUniqueConstraintError" && error.parent && error.parent.code === 'ER_DUP_ENTRY') {
+      // Manejar el error de duplicado aquí
+      res.status(400).send('Bad request: ya existe otra carrera con el mismo nombre');
+    } else {
+      console.error(`Error al intentar insertar en la base de datos: ${error}`);
+      res.sendStatus(500);
+    }
+  }
+};
 
 
-
-
-const crearCarrera = (req,res) => {
-    models.carrera
-    .create({ nombre: req.body.nombre, descripcion: req.body.descripcion, duracion: req.body.duracion })
-    .then(carrera => res.status(201).send({ id: carrera.id }))
-    .catch(error => {
-      if (error == "SequelizeUniqueConstraintError: Validation error") {
-        res.status(400).send('Bad request: existe otra carrera con el mismo nombre')
-      }
-      else {
-        console.log(`Error al intentar insertar en la base de datos: ${error}`)
-        res.sendStatus(500)
-      }
-    });
-}
 
 
 const findCarrera = (id, { onSuccess, onNotFound, onError }) => {
     models.carrera
       .findOne({
-        attributes: ["id", "nombre"],
+        attributes: ["id", "nombre", "descripcion", "duracion"],
         where: { id }
       })
       .then(carrera => (carrera ? onSuccess(carrera) : onNotFound()))
@@ -82,7 +96,7 @@ const obtenerCarrera = (req,res) => {
 const actualizarCarrera = (req,res) => {
     const onSuccess = carrera =>
     carrera
-      .update({ nombre: req.body.nombre }, { fields: ["nombre"] })
+      .update({ nombre: req.body.nombre, descripcion: req.body.descripcion, duracion: req.body.duracion }, { fields: ["nombre","descripcion","duracion"] })
       .then(() => res.sendStatus(200))
       .catch(error => {
         if (error == "SequelizeUniqueConstraintError: Validation error") {

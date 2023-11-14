@@ -1,19 +1,24 @@
 var express = require("express");
 var router = express.Router();
-const {obtenerCarreras, crearCarrera, obtenerCarrera, actualizarCarrera, eliminarCarrera} = require('../controllers/carreraControllers')
+const carreraControllers = require('../controllers/carreraControllers')
 
 
-router.get("/obtener-carreras", obtenerCarreras)
+// middle para proteger rutas
 
-router.post("/",crearCarrera)
-
-router.get("/:id", obtenerCarrera)
-
-router.put("/:id", actualizarCarrera)
-
-router.delete("/:id", eliminarCarrera)
+const auth = require('../middleware/auth')
 
 
+
+
+router.get("/", auth ,carreraControllers.obtenerCarreras)
+
+router.post("/", carreraControllers.crearCarrera)
+
+router.get("/:id", carreraControllers.obtenerCarrera)
+
+router.put("/:id", carreraControllers.actualizarCarrera)
+
+router.delete("/:id", carreraControllers.eliminarCarrera)
 
 
 module.exports = router;

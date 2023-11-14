@@ -29,6 +29,13 @@ const registrarUsuario = async (req,res) => {
     }
 }
 
+
+
+
+
+
+
+
 const autenticarUsuario = async (req, res, next) => {
     try {
         // Buscar usuario
