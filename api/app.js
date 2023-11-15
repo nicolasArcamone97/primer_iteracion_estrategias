@@ -18,6 +18,9 @@ app.use(cors({
   origin: whiteList
 }));
 
+
+
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -28,15 +31,24 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+
+// routing
 app.use('/carrera', carrerasRouter);
 app.use('/materia', materiasRouter);
 app.use('/profesor', profesoresRouter);
 app.use('/usuario', usuariosRouter);
 
+
+
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
 });
+
+
+
 
 // error handler
 app.use(function(err, req, res, next) {

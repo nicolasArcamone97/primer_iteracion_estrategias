@@ -2,48 +2,47 @@ var models = require("../models");
 
 
 
-const obtenerCarreras = (req,res) => {
-  models.carrera
-    .findAll({
-      attributes:["id", "nombre", "descripcion", "duracion"],
-      include: [{as: "Materias", model: models.materia, attributes: ["id","nombre"]}]
-    }).then(carreras => res.send(carreras))
-    .catch(() => res.sendStatus(500));
+// const obtenerCarreras = (req,res) => {
+//   models.carrera
+//     .findAll({
+//       attributes:["id", "nombre", "descripcion", "duracion"],
+//       include: [{as: "Materias", model: models.materia, attributes: ["id","nombre"]}]
+//     }).then(carreras => res.send(carreras))
+//     .catch(() => res.sendStatus(500));
+// }
+
+
+
+const obtenerCarreras = async(req, res, next) => {
+  const {pagina = 1, elementosPorPagina = 5} = req.query;
+  
+  const paginaActual = parseInt(pagina);
+  const elementosPorPaginaInt = parseInt(elementosPorPagina);
+
+  const offset = (paginaActual - 1) * elementosPorPaginaInt;
+
+  const options = {
+    limit: elementosPorPaginaInt,
+    offset: offset,
+    attributes: ["id", "nombre", "descripcion", "duracion"],
+    include: [
+      {
+        model: models.materia,
+        attributes: ["id", "nombre"],
+        as: "Materias"
+      }
+    ]
+  };
+
+  const {count, rows} = await models.carrera.findAndCountAll(options)
+
+  res.json({
+    status:'success',
+    total:count,
+    categories:rows
+  })
 }
 
-// const obtenerCarreras = (req, res) => {
-//   const pagina = parseInt(req.query.pagina) || 1;
-//   const elementosPorPagina = parseInt(req.query.elementosPorPagina) || 5;
-//   const offset = (pagina - 1) * elementosPorPagina;
-
-//   models.carrera
-//     .findAndCountAll({
-//       attributes: ["id", "nombre", "descripcion", "duracion"],
-//       include: [
-//         {
-//           model: models.materia,
-//           attributes: ["id", "nombre"],
-//           as: "Materias"
-//         }
-//       ],
-//       limit: elementosPorPagina,
-//       offset: offset
-//     })
-//     .then(resultado => {
-//       const carreras = resultado.rows;
-//       const totalCarreras = resultado.count;
-
-//       const totalPaginas = Math.ceil(totalCarreras / elementosPorPagina);
-
-//       res.json({
-//         carreras,
-//         totalCarreras,
-//         totalPaginas,
-//         paginaActual: pagina
-//       });
-//     })
-//     .catch(() => res.sendStatus(500));
-// };
 
 
 

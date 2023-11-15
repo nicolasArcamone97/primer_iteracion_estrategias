@@ -4,7 +4,7 @@ const { obtenerMaterias, crearMateria, obtenerMateria, actualizarMateria, elimin
 
 // middle para proteger rutas
 
-const auth = require('../middleware/auth')
+const auth = require('../verificarToken/auth')
 
 
 

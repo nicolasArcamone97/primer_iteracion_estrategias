@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     email: DataTypes.STRING
   }, {});
 
+  
   profesor.associate = function(models) {
     profesor.hasMany(models.materia, {
       foreignKey: 'id_profesor', 

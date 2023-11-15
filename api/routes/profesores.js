@@ -4,7 +4,7 @@ const { obtenerProfesores, crearProfesor, obtenerProfesor, actualizarProfesor, e
 
 // middle para proteger rutas
 
-const auth = require('../middleware/auth')
+const auth = require('../verificarToken/auth')
 
 
 

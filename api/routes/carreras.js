@@ -3,14 +3,15 @@ var router = express.Router();
 const carreraControllers = require('../controllers/carreraControllers')
 
 
-// middle para proteger rutas
-
-const auth = require('../middleware/auth')
+// proteger rutas
+const auth = require('../verificarToken/auth')
 
 
 
 
 router.get("/", auth ,carreraControllers.obtenerCarreras)
+
+
 
 router.post("/", carreraControllers.crearCarrera)
 

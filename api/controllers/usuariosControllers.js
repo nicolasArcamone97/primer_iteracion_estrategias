@@ -33,9 +33,6 @@ const registrarUsuario = async (req,res) => {
 
 
 
-
-
-
 const autenticarUsuario = async (req, res, next) => {
     try {
         // Buscar usuario
@@ -52,7 +49,7 @@ const autenticarUsuario = async (req, res, next) => {
             return res.status(401).json({ mensaje: "Password Incorrecto" });
         }
 
-        // Password correcto, firmar el token
+        // Password correcto, crear token
         const token = jwt.sign({
             email: usuario.email,
             nombre: usuario.nombre,
