@@ -33,7 +33,7 @@ const registrarUsuario = async (req,res) => {
 
 
 
-const autenticarUsuario = async (req, res, next) => {
+const autenticarUsuario = async (req, res) => {
     try {
         // Buscar usuario
         const usuario = await models.usuario.findOne({ where: { email: req.body.email } });
@@ -49,7 +49,7 @@ const autenticarUsuario = async (req, res, next) => {
             return res.status(401).json({ mensaje: "Password Incorrecto" });
         }
 
-        // Password correcto, crear token
+        // Password correcto, firma de token
         const token = jwt.sign({
             email: usuario.email,
             nombre: usuario.nombre,

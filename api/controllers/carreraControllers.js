@@ -2,46 +2,46 @@ var models = require("../models");
 
 
 
-// const obtenerCarreras = (req,res) => {
-//   models.carrera
-//     .findAll({
-//       attributes:["id", "nombre", "descripcion", "duracion"],
-//       include: [{as: "Materias", model: models.materia, attributes: ["id","nombre"]}]
-//     }).then(carreras => res.send(carreras))
-//     .catch(() => res.sendStatus(500));
-// }
-
-
-
-const obtenerCarreras = async(req, res, next) => {
-  const {pagina = 1, elementosPorPagina = 5} = req.query;
-  
-  const paginaActual = parseInt(pagina);
-  const elementosPorPaginaInt = parseInt(elementosPorPagina);
-
-  const offset = (paginaActual - 1) * elementosPorPaginaInt;
-
-  const options = {
-    limit: elementosPorPaginaInt,
-    offset: offset,
-    attributes: ["id", "nombre", "descripcion", "duracion"],
-    include: [
-      {
-        model: models.materia,
-        attributes: ["id", "nombre"],
-        as: "Materias"
-      }
-    ]
-  };
-
-  const {count, rows} = await models.carrera.findAndCountAll(options)
-
-  res.json({
-    status:'success',
-    total:count,
-    categories:rows
-  })
+const obtenerCarreras = (req,res) => {
+  models.carrera
+    .findAll({
+      attributes:["id", "nombre", "descripcion", "duracion"],
+      include: [{as: "Materias", model: models.materia, attributes: ["id","nombre"]}]
+    }).then(carreras => res.send(carreras))
+    .catch(() => res.sendStatus(500));
 }
+
+  
+
+// const obtenerCarreras = async(req, res) => {
+//   const {pagina = 1, elementosPorPagina = 5} = req.query;
+  
+//   const paginaActual = parseInt(pagina);
+//   const elementosPorPaginaInt = parseInt(elementosPorPagina);
+
+//   const offset = (paginaActual - 1) * elementosPorPaginaInt;
+
+//   const options = {
+//     limit: elementosPorPaginaInt,
+//     offset: offset,
+//     attributes: ["id", "nombre", "descripcion", "duracion"],
+//     include: [
+//       {
+//         model: models.materia,
+//         attributes: ["id", "nombre"],
+//         as: "Materias"
+//       }
+//     ]
+//   };
+
+//   const {count, rows} = await models.carrera.findAndCountAll(options)
+
+//   res.json({
+//     status:'success',
+//     total:count,
+//     carreras:rows
+//   })
+// }
 
 
 
@@ -83,6 +83,7 @@ const findCarrera = (id, { onSuccess, onNotFound, onError }) => {
   };
 
 
+  
 const obtenerCarrera = (req,res) => {
     findCarrera(req.params.id, {
         onSuccess: carrera => res.send(carrera),
